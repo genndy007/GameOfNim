@@ -14,6 +14,8 @@ OFFSET_Y = 100
 THING_WIDTH = 40
 OFF_BETW_THINGS = 20
 
+# Who's turn at start
+TURN = TURN_HUMAN
 # Colors
 BLACK = (0,0,0)
 WHITE = (255,255,255)
@@ -31,10 +33,11 @@ def generate_things():
     things = []
     offx = OFFSET_X
     offy = OFFSET_Y
-    for amount in INITIAL_PILES:
+    for i in range(len(INITIAL_PILES)):
+        amount = INITIAL_PILES[i]
         things_pile = []
-        for i in range(amount):
-            t = Thing(offx, offy, THING_WIDTH, THING_WIDTH)
+        for _ in range(amount):
+            t = Thing(offx, offy, THING_WIDTH, THING_WIDTH, i)
             things_pile.append(t)
             offy += OFF_BETW_THINGS + THING_WIDTH
 
@@ -50,21 +53,48 @@ def draw_things(things):
     for pile in things:
         for t in pile:
             t.draw(screen)
-    
+
+
     
 # main game loop
 def game():
     running = True
     things = generate_things()
+    turn_done = False
     while running:
         screen.fill(WHITE)
         draw_things(things)
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:  # Let normally quit
                 running = False
+
+            if TURN = TURN_HUMAN:
+                if event.type == pygame.MOUSEBUTTONDOWN:  # if pressed
+                    lmb, mmb, rmb = pygame.mouse.get_pressed()
+                    x, y = event.pos
+
+                    for i in range(len(things)):   # check all things if pressed on
+                        pile = things[i]
+                        for j in range(len(pile)):
+                            t = pile[j]
+                            if t.isOver((x,y)):
+                                turn_done = True
+                                INITIAL_PILES[i] -= 1
+                                pile.remove(t)
+                                break
+
+
+                    # Here will be button of submission usage
+
+
+
+
+
+
 
         clock.tick(FPS)
         pygame.display.flip()
 
 
 game()
+

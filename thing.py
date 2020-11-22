@@ -5,12 +5,13 @@ BLACK = (0,0,0)
 
 
 class Thing:
-    def __init__(self, x, y, width, height, color=GREEN):
+    def __init__(self, x, y, width, height, pile_number, color=GREEN):
         self.color = color
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.pile_number = pile_number
 
 
     def draw(self, scr, outline=BLACK):
