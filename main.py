@@ -260,10 +260,11 @@ def game():
     things = generate_things(piles)
     turn_done = False
     game_over = False
+    human_chose_pile = None
     while running:
         # print(piles)
-        print(TURN)
-        print(things)
+        # print(TURN)
+        # print(things)
         screen.fill(WHITE) 
 
         draw_things(things)
@@ -303,7 +304,7 @@ def game():
 
 
             TURN = TURN_HUMAN   # end turn and give it to human
-            
+            human_chose_pile = None
 
         
         for event in pygame.event.get():
@@ -324,10 +325,16 @@ def game():
                         for j in range(len(pile)):
                             t = pile[j]
                             if t.isOver((x,y)):
-                                turn_done = True
-                                piles[i] -= 1
-                                pile.remove(t)
-                                break
+                                if human_chose_pile is None:  # here is choice prohibition
+                                    human_chose_pile = i
+                                    turn_done = True
+                                    piles[i] -= 1
+                                    pile.remove(t)
+                                    break
+                                elif human_chose_pile == i:
+                                    piles[i] -= 1
+                                    pile.remove(t)
+                                    break
 
 
         
