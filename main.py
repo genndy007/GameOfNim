@@ -4,21 +4,21 @@ from const import INITIAL_PILES, TURN_HUMAN, TURN_COMPUTER
 from thing import Thing
 
 # Screen params
-WIN_WIDTH = 800
+WIN_WIDTH = 700
 WIN_HEIGHT = 600
 FPS = 60
 
 # Drawing things offsets
 OFFSET_X = 100
-OFFSET_Y = 100
+OFFSET_Y = 50
 THING_WIDTH = 40
 OFF_BETW_THINGS = 20
 
-# Who's turn at start
-TURN = TURN_HUMAN
+
 # Colors
 BLACK = (0,0,0)
 WHITE = (255,255,255)
+RED = (255,0,0)
 
 
 # initialise my precious pygame
@@ -55,23 +55,37 @@ def draw_things(things):
             t.draw(screen)
 
 
+
+
+
     
 # main game loop
 def game():
+    # Who's turn at start
+    TURN = TURN_HUMAN
+
+    button_submission = Thing(250, 525, 200, 50, None, color=RED)
     running = True
     things = generate_things()
     turn_done = False
     while running:
         screen.fill(WHITE)
         draw_things(things)
+        button_submission.draw(screen)
+
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # Let normally quit
                 running = False
 
-            if TURN = TURN_HUMAN:
+            if TURN == TURN_HUMAN:
                 if event.type == pygame.MOUSEBUTTONDOWN:  # if pressed
                     lmb, mmb, rmb = pygame.mouse.get_pressed()
                     x, y = event.pos
+
+                    # Here will be button of submission usage
+                    if turn_done and button_submission.isOver((x,y)):
+                        TURN = TURN_COMPUTER
 
                     for i in range(len(things)):   # check all things if pressed on
                         pile = things[i]
@@ -84,7 +98,7 @@ def game():
                                 break
 
 
-                    # Here will be button of submission usage
+                    
 
 
 
