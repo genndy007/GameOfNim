@@ -146,6 +146,41 @@ class Thing:
 
 ##########################
 ##########################
+
+
+
+
+# Button class
+##########################
+class Button:
+    def __init__(self, x, y, width, height, color=GREEN, text=''):
+        self.color = color
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+
+    def draw(self, scr, outline=None):
+        if outline:
+            pygame.draw.rect(scr, outline, (self.x-2, self.y-2, self.width+4, self.height+4), 0)
+
+        pygame.draw.rect(scr, self.color, (self.x, self.y, self.width, self.height), 0)
+        
+        if self.text != '':
+            font = pygame.font.Font('MenuFont.ttf', 20)
+            text = font.render(self.text, 1, BLACK)
+            scr.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
+
+    def isOver(self, pos):   # Here we take mouse position and compare it
+        mouse_x = pos[0]
+        mouse_y = pos[1]
+        if mouse_x > self.x and mouse_x < self.x + self.width:
+            if mouse_y > self.y and mouse_y < self.y + self.height:
+                return True
+        
+        return False
+
 ##########################
 
 # create array of Thing at start of game
@@ -187,6 +222,37 @@ def show_fullscreen_text(txt):
 def game():
     # Who's turn at start
     TURN = TURN_HUMAN
+    turn_choose = True
+    button_human = Button(250, 200, 200, 50, text="Human first")
+    button_comp = Button(250, 400, 200, 50, text="Computer first")
+    while turn_choose:
+        screen.fill(WHITE)
+
+        button_human.draw(screen, outline=BLACK)
+        button_comp.draw(screen, outline=BLACK)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Let normally quit
+                turn_choose = False
+                exit(0)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                lmb, mmb, rmb = pygame.mouse.get_pressed()
+                x, y = event.pos
+
+                if button_human.isOver((x,y)):
+                    TURN = TURN_HUMAN
+                    turn_choose = False
+                if button_comp.isOver((x,y)):
+                    TURN = TURN_COMPUTER
+                    turn_choose = False
+
+
+        clock.tick(FPS)
+        pygame.display.flip()    
+
+
+
     piles = [3,5,7]
     txt_winner = 'You win'
     button_submission = Thing(250, 525, 200, 50, None, color=RED)
