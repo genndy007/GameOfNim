@@ -32,7 +32,7 @@ INITIAL_PILES = [3,5,7]
 pygame.init()
 
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-pygame.display.set_caption("Game of Nim - game of full info")
+pygame.display.set_caption("Classical Nim game")
 clock = pygame.time.Clock()
 
 
@@ -220,6 +220,43 @@ def show_fullscreen_text(txt):
     
 # main game loop
 def game():
+    ############# HELP SHOWING
+    # Application shows rules of game at start
+    rule_font = pygame.font.Font('MenuFont.ttf', 28)
+    rules = "Nim is a game where players take things that are placed in 3 piles.\n\
+At one turn, player can take any number of things of only one pile.\n\
+Submit your choice with pressing red button at screen bottom.\n\
+The winner is who takes the last thing.\n\
+I wish you luck, but opponent plays ultimate winning strategy!"
+    lines = rules.split('\n')
+    showing_rules = True
+    button_ok = Button(250, 400, 200, 50, text="Ok. Bring it on!")
+    while showing_rules:
+        screen.fill(WHITE)
+        button_ok.draw(screen, outline=BLACK)
+        off_lines = 0
+        for line in lines:
+            rule_text = rule_font.render(line, 1, BLACK)
+            screen.blit(rule_text, (50, 100+off_lines))
+            off_lines += 40
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Let normally quit
+                showing_rules = False
+                exit(0)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                lmb, mmb, rmb = pygame.mouse.get_pressed()
+                x, y = event.pos
+
+                if button_ok.isOver((x,y)):
+                    showing_rules = False
+
+
+        clock.tick(FPS)
+        pygame.display.flip() 
+
+    ######## TURN CHOICE
     # Who's turn at start
     TURN = TURN_HUMAN
     turn_choose = True
@@ -252,7 +289,7 @@ def game():
         pygame.display.flip()    
 
 
-
+    ############ MAIN GAME
     piles = [3,5,7]
     txt_winner = 'You win'
     button_submission = Thing(250, 525, 200, 50, None, color=RED)
