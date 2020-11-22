@@ -51,9 +51,9 @@ def xor_array(arr):
 
 
 
-def trying_to_make_perfect_move():
-    for i in range(len(INITIAL_PILES)):   # go through every pile
-        pile = INITIAL_PILES[i]         # get the pile
+def trying_to_make_perfect_move(piles):
+    for i in range(len(piles)):   # go through every pile
+        pile = piles[i]         # get the pile
         if pile == 0:           # if it's empty then we
             continue            # have nothing to pull out
         
@@ -62,11 +62,11 @@ def trying_to_make_perfect_move():
             move = []     # check every variant of take
             result = pile - remove   # this is gonna be result
             
-            for j in range(len(INITIAL_PILES)):  # fulfill a move
+            for j in range(len(piles)):  # fulfill a move
                 if i == j:
                     move.append(result)
                 else:
-                    move.append(INITIAL_PILES[j])
+                    move.append(piles[j])
 
             # check if move is excellent to a strategy
             # it's what we need
@@ -74,9 +74,22 @@ def trying_to_make_perfect_move():
                 return move
 
 
-def check_one_pile_left():
+def make_typical_move(piles):
+    for i in range(len(piles)):
+        pile = piles[i]
+        if pile == 0:
+            continue
+
+        piles[i] -= 1
+        break
+    
+    return piles
+    
+
+
+def check_one_pile_left(piles):
     zeros = 0
-    for pile in INITIAL_PILES:
+    for pile in piles:
         if pile == 0:
             zeros += 1
 
@@ -84,6 +97,16 @@ def check_one_pile_left():
         return True
 
     return False
+
+
+
+def find_index_where_not_zero(piles):
+    for i in range(len(piles)):
+        if piles[i] != 0:
+            return i
+
+
+
 ###################################
 #################################
 ##################
@@ -126,12 +149,12 @@ class Thing:
 ##########################
 
 # create array of Thing at start of game
-def generate_things():
+def generate_things(piles):
     things = []
     offx = OFFSET_X
     offy = OFFSET_Y
-    for i in range(len(INITIAL_PILES)):
-        amount = INITIAL_PILES[i]
+    for i in range(len(piles)):
+        amount = piles[i]
         things_pile = []
         for _ in range(amount):
             t = Thing(offx, offy, THING_WIDTH, THING_WIDTH, i)
@@ -156,7 +179,7 @@ def draw_things(things):
 def show_fullscreen_text(txt):
     font = pygame.font.Font('MenuFont.ttf', 40)
     text = font.render(txt, 1, RED)
-    screen.blit(screen, (300, 300))
+    screen.blit(text, (300, 300))
 
 
     
@@ -164,16 +187,17 @@ def show_fullscreen_text(txt):
 def game():
     # Who's turn at start
     TURN = TURN_HUMAN
-    
+    piles = [3,5,7]
     txt_winner = 'You win'
     button_submission = Thing(250, 525, 200, 50, None, color=RED)
     running = True
-    things = generate_things()
+    things = generate_things(piles)
     turn_done = False
     game_over = False
     while running:
-        print(INITIAL_PILES)
-
+        # print(piles)
+        print(TURN)
+        print(things)
         screen.fill(WHITE) 
 
         draw_things(things)
@@ -181,25 +205,38 @@ def game():
 
 
         if TURN == TURN_COMPUTER:
-            one_pile = check_one_pile_left()
+            one_pile = check_one_pile_left(piles)
             if one_pile:
-                things = []
+                print("One pile")
+                idx = find_index_where_not_zero(piles)
+                for _ in range(piles[idx]):
+                    things[idx].pop()
+
+                piles[idx] = 0
                 txt_winner = 'You lost'
+                running = False
                 game_over = True
                 continue    # THIS MIGHT BREAK
                 
-            move = trying_to_make_perfect_move()
+            move = trying_to_make_perfect_move(piles)
+            # print(move)
 
-            for i in range(len(INITIAL_PILES)):
-                if move[i] != INITIAL_PILES[i]:
-                    times_deleting = INITIAL_PILES[i] - move[i]
-                    for i in range(times_deleting):
+            if move is not None:
+                for i in range(len(piles)):
+                    if move[i] != piles[i]:
+                        times_deleting = piles[i] - move[i]
+                        for j in range(times_deleting):
+                            things[i].pop()
+
+                piles = move
+            else:
+                bad_move = make_typical_move(piles)    # do a bad move
+                for i in range(len(piles)):
+                    if bad_move[i] != piles[i]:
                         things[i].pop()
 
 
-
-            INITIAL_PILES = move
-            TURN = TURN_HUMAN
+            TURN = TURN_HUMAN   # end turn and give it to human
             
 
         
@@ -222,7 +259,7 @@ def game():
                             t = pile[j]
                             if t.isOver((x,y)):
                                 turn_done = True
-                                INITIAL_PILES[i] -= 1
+                                piles[i] -= 1
                                 pile.remove(t)
                                 break
 
@@ -231,6 +268,18 @@ def game():
 
         clock.tick(FPS)
         # print(TURN)
+        pygame.display.flip()
+
+    while game_over:
+        screen.fill(WHITE)
+        show_fullscreen_text(txt_winner)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Let normally quit
+                game_over = False
+
+
+        clock.tick(FPS)
         pygame.display.flip()
 
 
